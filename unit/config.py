@@ -1,10 +1,9 @@
 import ujson
 
 # Unit - ID
-project = "tlvlp.iot.BazsalikON"
-name = "aero"
-mqtt_unit_id = "{}-{}".format(project, name)
-unit_id_dict = {"unitID": mqtt_unit_id, "project": project, "name": name}
+project = "tlvlp_iot"
+name = "garden_2020"
+unit_id_dict = {"project": project, "name": name}
 
 # Unit - Hardware
 water_temp_sensor_pin = 23
@@ -46,7 +45,7 @@ mqtt_topic_status_request = "/global/status_request"
 mqtt_topic_status = "/global/status"
 mqtt_topic_inactive = "/global/inactive"
 mqtt_topic_error = "/global/error"
-mqtt_topic_control = "/units/{}/control".format(mqtt_unit_id)
+mqtt_topic_control = "/units/{}-{}/control".format(project, name)
 mqtt_subscribe_topics = [mqtt_topic_status_request, mqtt_topic_control]
 
 

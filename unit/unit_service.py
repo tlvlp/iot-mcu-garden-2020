@@ -25,12 +25,8 @@ class UnitService:
                                      config.growlight_pin,
                                      config.growlight_relay_active_at,
                                      config.growlight_persistence_path)
-        self.irrigation_relay = Relay("irrigation",
-                                      config.irrigation_pin,
-                                      config.irrigation_relay_active_at)
         # Run scheduled tasks
         loop = asyncio.get_event_loop()
-        loop.create_task(self.automated_irrigation_loop())
         loop.create_task(self.status_updater_loop())
         loop.create_task(self.incoming_message_processing_loop())
         print("Unit service - Service initialization complete")
@@ -42,9 +38,6 @@ class UnitService:
         status_dict.update([
             await self.water_temp_sensor.read_first_celsius(),
             self.growlight_relay.get_state(),
-            self.irrigation_relay.get_state(),
-            ("irrigationOnSec", config.irrigation_on_sec),
-            ("irrigationOffSec", config.irrigation_off_sec)
         ])
         status_json = ujson.dumps(status_dict)
         message = MqttMessage(config.mqtt_topic_status, status_json)
@@ -101,15 +94,6 @@ class UnitService:
         message = MqttMessage(config.mqtt_topic_error, error_json)
         await self.mqtt_service.add_outgoing_message_to_queue(message)
         print(error)
-
-    async def automated_irrigation_loop(self) -> None:
-        """ Automatically turns the unit's irrigation on and off using pre-configured values """
-        while True:
-            self.irrigation_relay.relay_on()
-            await asyncio.sleep(config.irrigation_on_sec)
-            self.irrigation_relay.relay_off()
-            await asyncio.sleep(config.irrigation_off_sec)
-
 
 
 
