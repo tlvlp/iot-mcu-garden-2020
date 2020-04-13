@@ -1,10 +1,11 @@
-import uasyncio as asyncio
 import ujson
-from unit import config, shared_flags
+
+import uasyncio as asyncio
+from modules.exceptions import InvalidModuleInputException
 from modules.relay import Relay
 from modules.temp_sensor_ds18b20 import TempSensorDS18B20
-from modules.exceptions import InvalidModuleInputException
 from mqtt.mqtt_service import MqttMessage
+from unit import config, shared_flags
 
 
 class UnitService:
@@ -35,10 +36,10 @@ class UnitService:
         while not shared_flags.wifi_is_connected and not shared_flags.mqtt_is_connected:
             await asyncio.sleep(0)
         status_dict = config.unit_id_dict.copy()
-        status_dict.update([
-            await self.water_temp_sensor.read_first_celsius(),
+        status_dict.update({'modules': [
+            await self.water_temp_sensor.get_first_value_in_celsius(),
             self.growlight_relay.get_state(),
-        ])
+        ]})
         status_json = ujson.dumps(status_dict)
         message = MqttMessage(config.mqtt_topic_status, status_json)
         await self.mqtt_service.add_outgoing_message_to_queue(message)

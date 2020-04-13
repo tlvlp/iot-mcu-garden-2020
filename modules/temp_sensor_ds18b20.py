@@ -1,7 +1,8 @@
-import uasyncio as asyncio
+import ds18x20
 from machine import Pin
 from onewire import OneWire, OneWireError
-import ds18x20
+
+import uasyncio as asyncio
 
 
 class TempSensorDS18B20:
@@ -13,11 +14,11 @@ class TempSensorDS18B20:
         Tested on ESP32 MCUs
         :param pin_num: Digital input pin number for reading measurements
         """
-        self.reference = "ds18b20|" + name
+        self.status = {'type': 'ds18b20', 'name': name}
         one_wire = OneWire(Pin(pin_num))
         self.channel = ds18x20.DS18X20(one_wire)
 
-    async def read_first_celsius(self, delay_ms=750) -> tuple:
+    async def get_first_value_in_celsius(self, delay_ms=750):
         """
         :param delay_ms: a set delay before the reading is done
         :return: readings from the first sensor on the pin
@@ -25,9 +26,10 @@ class TempSensorDS18B20:
         """
         readings = await self.read_all_celsius(delay_ms)
         if len(readings) != 0:
-            return self.reference, readings[0]
+            self.status.update({'value': readings[0]})
         else:
-            return self.reference, -1.0
+            self.status.update({'value': -1.0})
+        return self.status
 
     async def read_all_celsius(self, delay_ms=750) -> list:
         """

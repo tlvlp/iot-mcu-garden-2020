@@ -3,7 +3,7 @@ import ujson
 # Unit - ID
 project = "tlvlp_iot"
 name = "garden_2020"
-unit_id_dict = {"project": project, "name": name}
+unit_id_dict = {'id': {"project": project, "unitName": name}}
 
 # Unit - Hardware
 water_temp_sensor_pin = 23

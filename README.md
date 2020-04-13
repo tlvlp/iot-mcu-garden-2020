@@ -1,4 +1,4 @@
-# IoT MCU - BazsalikOn Aero
+# IoT MCU - Garden 2020 controller module
 
 ## Summary
 - Part of the [tlvlp IoT project](https://github.com/tlvlp/iot-project-summary)
