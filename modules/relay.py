@@ -1,4 +1,5 @@
 from machine import Pin
+
 from modules.exceptions import InvalidModuleInputException
 
 
@@ -13,8 +14,7 @@ class Relay:
         :param active_at: the relay is either active at a HIGH(1) or LOW(0) Pin state
         :param persist_path: if a path is provided the relay's state will be persisted to and loaded from there.
         """
-        reference = "relay|"
-        self.id = reference + name
+        self.status = {'type': 'relay', 'name': name}
         self.active_at = active_at
         self.persist_path = persist_path
         self.pin = Pin(pin_num, Pin.OUT, value=self.get_off_state())
@@ -32,9 +32,6 @@ class Relay:
         else:
             return 0
 
-    def get_module_id(self) -> str:
-        return self.id
-
     def handle_control_message(self, value_str: str):
         value = int(float(value_str))
         if value == 1:
@@ -44,9 +41,8 @@ class Relay:
         else:
             raise InvalidModuleInputException
 
-    def get_state(self) -> tuple:
-        """ Returns a tuple with the reference name and the current relay state that is either 1 (on) or 0 (off) """
-        return self.id, self.state
+    def get_state(self):
+        return self.status.update({'reading': self.state})
 
     def set_state(self, state: int):
         if int(state) == 1:

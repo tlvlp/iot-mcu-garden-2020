@@ -37,7 +37,7 @@ class UnitService:
             await asyncio.sleep(0)
         status_dict = config.unit_id_dict.copy()
         status_dict.update({'modules': [
-            await self.water_temp_sensor.get_first_value_in_celsius(),
+            await self.water_temp_sensor.get_first_reading_in_celsius(),
             self.growlight_relay.get_state(),
         ]})
         status_json = ujson.dumps(status_dict)
@@ -69,20 +69,28 @@ class UnitService:
     async def handle_control_event(self, payload_json: str) -> None:
         """ Processes an incoming control message """
         try:
-            payload = ujson.loads(payload_json)
-            if payload is None:
+            modules = ujson.loads(payload_json)
+            if modules is None:
                 await self.send_error_to_server("Unit service - Error parsing payload!")
-            module = next(iter(payload))
-            value = payload.get(module)
-            if self.growlight_relay.id in payload.keys():
-                self.growlight_relay.handle_control_message(value)
-            else:
-                await self.send_error_to_server("Unit service - Error! Unrecognized module id: {}".format(payload_json))
+
+            any_module_matched = False
+            for module_json in modules:
+                if self.module_matches(module_json, self.growlight_relay):
+                    self.growlight_relay.handle_control_message(module_json.get('value'))
+                    any_module_matched = True
+            if not any_module_matched:
+                await self.send_error_to_server("Unit service - Error! Unrecognized module: {}".format(payload_json))
+
         except ValueError:
             await self.send_error_to_server("Unit service - Error! Invalid payload: {}".format(payload_json))
         except InvalidModuleInputException:
             await self.send_error_to_server(
                 "Unit service - Error! Invalid value in control payload: {}".format(payload_json))
+
+    @staticmethod
+    def module_matches(module_json, module):
+        return module_json['type'] == module.status.get('type') \
+               and module_json['name'] == module.status.get('name')
 
     async def send_error_to_server(self, error: str) -> None:
         while not shared_flags.wifi_is_connected and not shared_flags.mqtt_is_connected:

@@ -18,7 +18,7 @@ class TempSensorDS18B20:
         one_wire = OneWire(Pin(pin_num))
         self.channel = ds18x20.DS18X20(one_wire)
 
-    async def get_first_value_in_celsius(self, delay_ms=750):
+    async def get_first_reading_in_celsius(self, delay_ms=750):
         """
         :param delay_ms: a set delay before the reading is done
         :return: readings from the first sensor on the pin
@@ -26,9 +26,9 @@ class TempSensorDS18B20:
         """
         readings = await self.read_all_celsius(delay_ms)
         if len(readings) != 0:
-            self.status.update({'value': readings[0]})
+            self.status.update({'reading': readings[0]})
         else:
-            self.status.update({'value': -1.0})
+            self.status.update({'reading': -1.0})
         return self.status
 
     async def read_all_celsius(self, delay_ms=750) -> list:
