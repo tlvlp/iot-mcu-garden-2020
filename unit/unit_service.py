@@ -103,27 +103,3 @@ class UnitService:
         message = MqttMessage(config.mqtt_topic_error, error_json)
         await self.mqtt_service.add_outgoing_message_to_queue(message)
         print(error)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
