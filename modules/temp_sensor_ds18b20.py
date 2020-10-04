@@ -14,7 +14,7 @@ class TempSensorDS18B20:
         Tested on ESP32 MCUs
         :param pin_num: Digital input pin number for reading measurements
         """
-        self.status = {'type': 'ds18b20', 'name': name}
+        self.status = {'module': 'ds18b20', 'name': name}
         one_wire = OneWire(Pin(pin_num))
         self.channel = ds18x20.DS18X20(one_wire)
 
@@ -26,9 +26,9 @@ class TempSensorDS18B20:
         """
         readings = await self.read_all_celsius(delay_ms)
         if len(readings) != 0:
-            self.status.update({'reading': readings[0]})
+            self.status.update({'value': readings[0]})
         else:
-            self.status.update({'reading': -1.0})
+            self.status.update({'value': -1.0})
         return self.status
 
     async def read_all_celsius(self, delay_ms=750) -> list:

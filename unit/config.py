@@ -35,6 +35,7 @@ mqtt_queue_size = 10
 mqtt_checkout_payload = ujson.dumps(unit_id_dict)
 
 # MQTT - Credentials
+mqtt_unit_id = "{}_{}".format(project, name)
 mqtt_server = "PLACEHOLDER"
 mqtt_port = "PLACEHOLDER"
 mqtt_user = "PLACEHOLDER"

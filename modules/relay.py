@@ -14,7 +14,7 @@ class Relay:
         :param active_at: the relay is either active at a HIGH(1) or LOW(0) Pin state
         :param persist_path: if a path is provided the relay's state will be persisted to and loaded from there.
         """
-        self.status = {'type': 'relay', 'name': name}
+        self.status = {'module': 'relay', 'name': name}
         self.active_at = active_at
         self.persist_path = persist_path
         self.pin = Pin(pin_num, Pin.OUT, value=self.get_off_state())
@@ -41,8 +41,9 @@ class Relay:
         else:
             raise InvalidModuleInputException
 
-    def get_state(self):
-        return self.status.update({'reading': self.state})
+    async def get_state(self):
+        self.status.update({'value': self.state})
+        return self.status
 
     def set_state(self, state: int):
         if int(state) == 1:

@@ -38,7 +38,7 @@ class UnitService:
         status_dict = config.unit_id_dict.copy()
         status_dict.update({'modules': [
             await self.water_temp_sensor.get_first_reading_in_celsius(),
-            self.growlight_relay.get_state(),
+            await self.growlight_relay.get_state()
         ]})
         status_json = ujson.dumps(status_dict)
         message = MqttMessage(config.mqtt_topic_status, status_json)
@@ -89,7 +89,7 @@ class UnitService:
 
     @staticmethod
     def module_matches(module_json, module):
-        return module_json['type'] == module.status.get('type') \
+        return module_json['module'] == module.status.get('module') \
                and module_json['name'] == module.status.get('name')
 
     async def send_error_to_server(self, error: str) -> None:
